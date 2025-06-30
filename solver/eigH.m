@@ -33,7 +33,10 @@ if poly.deg == 1;
     eig = [poly.p(x)/poly.p(e)];
 else
     %scale x
-    scaler = norm(x,Inf);
+    scaler = norm(x,"inf");
+    if scaler <= 1
+        scaler = 1;
+    end
     x = x / scaler;
 
     %calculate the coefficients of p(x-te) by inverse Fourier transform
@@ -56,6 +59,9 @@ else
     x = x(poly.index);
     %scale x
     scaler = norm(x,1);
+    if scaler <= 1
+        scaler = 1;
+    end
     x = x / scaler;
 
     %calculate the coefficients of p(x+te) by convolution

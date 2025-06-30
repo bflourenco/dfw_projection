@@ -180,14 +180,20 @@ end
 %% calculate mean time to achieve some relative errors
 
 t_FW_Mosek = NaN(length(ratio_list),num_points);
+t_FW_Mosek_it = NaN(length(ratio_list),num_points);
+t_FW_Mosek_xabs = NaN(length(ratio_list),num_points);
 t_FW_DDS = NaN(length(ratio_list),num_points);
 success_FW_Mosek = zeros(length(ratio_list),1);
 success_FW_DDS = zeros(length(ratio_list),1);
 for k = 1:num_points
     for i = 1:length(ratio_list)
         if ~isempty(runtime_FW{k}(feas_FW{k}&((obj_vals_FW{k}-obj_vals_Mosek{k})<=obj_vals_Mosek{k}*ratio_list(i))))
+            min_it = find(((obj_vals_FW{k}-obj_vals_Mosek{k})<=obj_vals_Mosek{k}*ratio_list(i))&feas_FW{k},1);
+            t_FW_Mosek(i,k) = runtime_FW{k}(min_it);
+            t_FW_Mosek_xabs(i,k) = norm(x_FW{k}(:,min_it)-x_Mosek{k},"inf");
+            t_FW_Mosek_it(i,k) = min_it;
             success_FW_Mosek(i) = success_FW_Mosek(i)+1;
-            t_FW_Mosek(i,k) = min(runtime_FW{k}((obj_vals_FW{k}-obj_vals_Mosek{k})<=obj_vals_Mosek{k}*ratio_list(i)&feas_FW{k}));
+            %t_FW_Mosek(i,k) = min(runtime_FW{k}((obj_vals_FW{k}-obj_vals_Mosek{k})<=obj_vals_Mosek{k}*ratio_list(i)&feas_FW{k}));
         end
         if ~isempty(runtime_FW{k}(feas_FW{k}&((obj_vals_FW{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i))))
             success_FW_DDS(i) = success_FW_DDS(i)+1;
@@ -197,10 +203,10 @@ for k = 1:num_points
 end
 
 fprintf("\n Average time to achieve relative errors with respect to DDS\n\n")
-fprintf("relative error;\tFW (Mosek);std;success;\t\tFW (DDS);std;success;\n")
+fprintf("relative error;\tFW (Mosek);xabs;xstd;it;std;abs_t;std;rel_t,std;success;\t\tFW (DDS);std;success;\n")
 for i = 1:length(ratio_list)
-    fprintf("%.2e;\t%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f\n",ratio_list(i),...
-        mean(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),std(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),success_FW_Mosek(i)/num_points*100,...
+    fprintf("%.2e;\t%.2e;%.2e;%4.2f;%4.2f;%.2e;%4.2e;%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f\n",ratio_list(i),...
+        mean(t_FW_Mosek_xabs(i,:),"omitnan"),std(t_FW_Mosek_xabs(i,:),"omitnan"),mean(t_FW_Mosek_it(i,:),"omitnan"),std(t_FW_Mosek_it(i,:),"omitnan"),mean(t_FW_Mosek(i,:),"omitnan"),std(t_FW_Mosek(i,:),"omitnan"),mean(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),std(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),success_FW_Mosek(i)/num_points*100,...
         mean(t_FW_DDS(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW_DDS(i,:)'./runtime_DDS*100,"omitnan"),success_FW_DDS(i)/num_points*100)
 end
 
@@ -220,10 +226,10 @@ if save_to_file
     %fprintf(fileID,"n;p;tol;points\n");
     %fprintf(fileID,"%d;%g;%.1e;%d\n",n,p,IPM_tol,num_points);
     if (skip_DDS==true)
-            fprintf(fileID,"error,FWM,FWMstd,FWMSuccess\n");
+            fprintf(fileID,"error,FWMx,FWMxstd,FWMit,FWMstd,FWMabs,FWMabsstd,FWM,FWMstd,FWMSuccess\n");
             for i = 1:length(ratio_list)
-                fprintf(fileID,"%g,%g,%g,%g\n",ratio_list(i)*100,...
-                    mean(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),std(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),success_FW_Mosek(i)/num_points*100);
+                fprintf(fileID,"%g,%.2e,%.2e,%g,%g,%.2e,%.2e,%g,%g,%g\n",ratio_list(i)*100,...
+                    mean(t_FW_Mosek_xabs(i,:),"omitnan"),std(t_FW_Mosek_xabs(i,:),"omitnan"),mean(t_FW_Mosek_it(i,:),"omitnan"),std(t_FW_Mosek_it(i,:),"omitnan"),mean(t_FW_Mosek(i,:),"omitnan"),std(t_FW_Mosek(i,:),"omitnan"),mean(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),std(t_FW_Mosek(i,:)'./runtime_Mosek*100,"omitnan"),success_FW_Mosek(i)/num_points*100);
             end
     else
             fprintf(fileID,"error,FWM,FWMstd,FWMSuccess,FWD,FWDstd,FWDsuccess\n");

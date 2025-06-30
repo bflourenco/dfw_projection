@@ -32,3 +32,9 @@ ls -t | grep "proj_hyper_n20_d2_30_tol_low.*stats.csv" | head -n 1 | tee /dev/tt
 ls -t | grep "proj_hyper_n30_d27_30_tol_low.*stats.csv" | head -n 1 | tee /dev/tty | rename -f 's/.*tol_low\K.*$/\.csv/'
 ls -t | grep "proj_hyper_n40_d37_30_tol_low.*stats.csv" | head -n 1 | tee /dev/tty | rename -f 's/.*tol_low\K.*$/\.csv/'
 ls -t | grep "proj_hyper_n50_d47_30_tol_low.*stats.csv" | head -n 1 | tee /dev/tty | rename -f  's/.*tol_low\K.*$/\.csv/'
+
+ls -t | grep "proj_hyper_cd_n10_d1_30_tol_high.*stats.csv" | head -n 1 | tee /dev/tty | rename -f  's/.*tol_high\K.*$/\.csv/'
+ls -t | grep "proj_hyper_cd_n20_d2_30_tol_high.*stats.csv" | head -n 1 | tee /dev/tty | rename  -f 's/.*tol_high\K.*$/\.csv/'
+
+sed -i -e 's/cd1/cdi/g' -e 's/cd2/cdii/g' -e 's/cd3/cdiii/g' -e 's/cd4/cdiv/g' -e 's/cd5/cdv/g' -e 's/cd6/cdvi/g' proj_hyper_cd_n10_d1_30_tol_high.csv
+sed -i -e 's/cd1/cdi/g' -e 's/cd2/cdii/g' -e 's/cd3/cdiii/g' -e 's/cd4/cdiv/g' -e 's/cd5/cdv/g' -e 's/cd6/cdvi/g' proj_hyper_cd_n20_d2_30_tol_high.csv

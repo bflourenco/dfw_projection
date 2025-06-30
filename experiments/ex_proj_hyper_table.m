@@ -169,7 +169,7 @@ poly{1}.deg = n-deriv_num;
 poly{1}.index = 1:n;
 
 %%measure runtime
-%prepare data strorages for all datasets d
+%prepare data storages for all datasets d
 x_FW_ele = cell(1,num_points);
 y_FW_ele = cell(1,num_points);
 itr_FW_ele = zeros(1,num_points);
@@ -319,8 +319,14 @@ end
 %% calculate mean time to achieve some relative errors
 t_FW = NaN(length(ratio_list),num_points);
 t_FW_ele = NaN(length(ratio_list),num_points);
+t_FW_it = NaN(length(ratio_list),num_points);
+t_FW_ele_it = NaN(length(ratio_list),num_points);
+t_FW_xabs = NaN(length(ratio_list),num_points);
+t_FW_ele_xabs = NaN(length(ratio_list),num_points);
 t_AGM = NaN(length(ratio_list),num_points);
 t_AGM_ele = NaN(length(ratio_list),num_points);
+t_AGM_it = NaN(length(ratio_list),num_points);
+t_AGM_ele_it = NaN(length(ratio_list),num_points);
 success_FW = zeros(length(ratio_list),1);
 success_FW_ele = zeros(length(ratio_list),1);
 success_AGM = zeros(length(ratio_list),1);
@@ -328,19 +334,35 @@ success_AGM_ele = zeros(length(ratio_list),1);
 for i = 1:length(ratio_list)
     for k = 1:num_points
         if ~isempty(runtime_FW{k}( (obj_vals_FW{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW{k} ))
-            t_FW(i,k) = min(runtime_FW{k}((obj_vals_FW{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW{k}) );
+            %find the first iteration for which the iterate satisfies
+            %the given conditions
+            min_it = find(((obj_vals_FW{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)) & feas_FW{k},1);
+            t_FW(i,k) = runtime_FW{k}(min_it);
+            t_FW_it(i,k) = min_it;
+            t_FW_xabs(i,k) = norm(x_DDS{k}-x_FW{k}(:,min_it),"inf");
+            %t_FW(i,k) = min(runtime_FW{k}((obj_vals_FW{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW{k}) );
             success_FW(i) = success_FW(i)+1;
         end
         if ~isempty(runtime_FW_ele{k}((obj_vals_FW_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW_ele{k}))
-            t_FW_ele(i,k) = min(runtime_FW_ele{k}((obj_vals_FW_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW_ele{k} ));
+            min_it = find(((obj_vals_FW_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)) & feas_FW_ele{k},1);
+            t_FW_ele(i,k) = runtime_FW_ele{k}(min_it);
+            t_FW_ele_it(i,k) = min_it;
+            t_FW_ele_xabs(i,k) = norm(x_DDS{k}-x_FW_ele{k}(:,min_it),"inf");
+            %t_FW_ele(i,k) = min(runtime_FW_ele{k}((obj_vals_FW_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i) & feas_FW_ele{k} ));
             success_FW_ele(i) = success_FW_ele(i)+1;
         end
         if ~isempty(runtime_AGM{k}((obj_vals_AGM{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)))
-            t_AGM(i,k) = min(runtime_AGM{k}((obj_vals_AGM{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)));
+            min_it = find((obj_vals_AGM{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i),1);
+            t_AGM(i,k) = runtime_AGM{k}(min_it);
+            t_AGM_it(i,k) = min_it;
+            %t_AGM(i,k) = min(runtime_AGM{k}((obj_vals_AGM{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)));
             success_AGM(i) = success_AGM(i)+1;
         end
         if ~isempty(runtime_AGM_ele{k}((obj_vals_AGM_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)))
-            t_AGM_ele(i,k) = min(runtime_AGM_ele{k}((obj_vals_AGM_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)));
+            min_it = find((obj_vals_AGM_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i),1);
+            t_AGM_ele(i,k) = runtime_AGM_ele{k}(min_it);
+            t_AGM_ele_it(i,k) = min_it;
+            %t_AGM_ele(i,k) = min(runtime_AGM_ele{k}((obj_vals_AGM_ele{k}-obj_vals_DDS{k})<=obj_vals_DDS{k}*ratio_list(i)));
             success_AGM_ele(i) = success_AGM_ele(i)+1;
         end
     end
@@ -348,11 +370,11 @@ end
 
 % display results
 fprintf("\n Average time to achieve relative errors with respect to DDS\n\n")
-fprintf("relative error;\tFW;std;success;\t\tFW_ele;std;success;\tAGM;std;success;\tAGM_ele;std;success\n")
+fprintf("rel error;\tFW;xabs;xstd;it;std;abs_t;std;rel_t;std;success;\t\tFW_ele;xabs;xstd;it;std;abs_t;std;rel_t;std;success;\tAGM;std;success;\tAGM_ele;std;success\n")
 for i = 1:length(ratio_list)
-    fprintf("%.2e;\t%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f\n",ratio_list(i),...
-        mean(t_FW(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW(i,:)'./runtime_DDS*100,"omitnan"),success_FW(i)/num_points*100,...
-        mean(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),success_FW_ele(i)/num_points*100,...
+    fprintf("%.2e;\t%.2e;%.2e;%4.2f;%4.2f;%.2e;%.2e;%4.2f;%4.2f;%4.1f;\t%.2e;%.2e;%4.2f;%4.2f;%.2e;%.2e;%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f;\t%4.2f;%4.2f;%4.1f\n",ratio_list(i),...
+        mean(t_FW_xabs(i,:),"omitnan"),std(t_FW_xabs(i,:),"omitnan"),mean(t_FW_it(i,:),"omitnan"),std(t_FW_it(i,:),"omitnan"),mean(t_FW(i,:),"omitnan"),std(t_FW(i,:),"omitnan"),mean(t_FW(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW(i,:)'./runtime_DDS*100,"omitnan"),success_FW(i)/num_points*100,...
+        mean(t_FW_ele_xabs(i,:),"omitnan"),std(t_FW_ele_xabs(i,:),"omitnan"),mean(t_FW_ele_it(i,:),"omitnan"),std(t_FW_ele_it(i,:),"omitnan"),mean(t_FW_ele(i,:),"omitnan"),std(t_FW_ele(i,:),"omitnan"),mean(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),success_FW_ele(i)/num_points*100,...
         mean(t_AGM(i,:)'./runtime_DDS*100,"omitnan"),std(t_AGM(i,:)'./runtime_DDS*100,"omitnan"),success_AGM(i)/num_points*100,...
         mean(t_AGM_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_AGM_ele(i,:)'./runtime_DDS*100,"omitnan"),success_AGM_ele(i)/num_points*100)
 end
@@ -372,11 +394,11 @@ if save_to_file
     fileID = fopen(filename +"stats" +".csv",'w');
     %fprintf(fileID,"n;d;tol;points\n");
     %fprintf(fileID,"%d;%d;%.1e;%d\n",n,deriv_num,DDS_tol,num_points);
-    fprintf(fileID,"error,FW,FWstd,FWsuccess,FWEl,FWElstd,FWElsuccess,AGM,AGMstd,AGMsuccess,AGMEl,AGMElstd,AGMElsuccess\n");
+    fprintf(fileID,"error,FWx,FWxstd,FWit,FWitstd,FWabs,FWabsstd,FW,FWstd,FWsuccess,FWElx,FWElxstd,FWElit,FWElitstd,FWElabs,FWElabsstd,FWEl,FWElstd,FWElsuccess,AGM,AGMstd,AGMsuccess,AGMEl,AGMElstd,AGMElsuccess\n");
     for i = 1:length(ratio_list)
-        fprintf(fileID,"%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g,%g\n",ratio_list(i)*100,...
-            mean(t_FW(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW(i,:)'./runtime_DDS*100,"omitnan"),success_FW(i)/num_points*100,...
-            mean(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),success_FW_ele(i)/num_points*100,...
+        fprintf(fileID,"%g,%.2e,%.2e,%g,%g,%.2e,%.2e,%g,%g,%g,%.2e,%.2e,%g,%g,%.2e,%.2e,%g,%g,%g,%g,%g,%g,%g,%g,%g\n",ratio_list(i)*100,...
+            mean(t_FW_xabs(i,:),"omitnan"),std(t_FW_xabs(i,:),"omitnan"),mean(t_FW_it(i,:),"omitnan"),std(t_FW_it(i,:),"omitnan"),mean(t_FW(i,:),"omitnan"),std(t_FW(i,:),"omitnan"),mean(t_FW(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW(i,:)'./runtime_DDS*100,"omitnan"),success_FW(i)/num_points*100,...
+            mean(t_FW_ele_xabs(i,:),"omitnan"),std(t_FW_ele_xabs(i,:),"omitnan"),mean(t_FW_ele_it(i,:),"omitnan"),std(t_FW_ele_it(i,:),"omitnan"),mean(t_FW_ele(i,:),"omitnan"),std(t_FW_ele(i,:),"omitnan"),mean(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_FW_ele(i,:)'./runtime_DDS*100,"omitnan"),success_FW_ele(i)/num_points*100,...
             mean(t_AGM(i,:)'./runtime_DDS*100,"omitnan"),std(t_AGM(i,:)'./runtime_DDS*100,"omitnan"),success_AGM(i)/num_points*100,...
             mean(t_AGM_ele(i,:)'./runtime_DDS*100,"omitnan"),std(t_AGM_ele(i,:)'./runtime_DDS*100,"omitnan"),success_AGM_ele(i)/num_points*100);
     end

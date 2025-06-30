@@ -24,51 +24,60 @@ projecting onto hyperbolicity cones, see file
  2. Install the Mosek solver and the Matlab interface: [https://docs.mosek.com/latest/toolbox/install-interface.html](https://docs.mosek.com/latest/toolbox/install-interface.html)
  3. Open Matlab and add the *solver* folder to the Matlab path
 
-### Reproducing Tables 1,2,3,4,5,6
+In the paper we used DDS version 2.0 and Mosek version 10.
+
+### Reproducing Tables 2-11
  1. Run the file *experiments/experiments_batch_hyper.m*. It may take a whole day to complete.
  2. Run the file *experiments/experiments_batch_pcone.m*. It will take a few minutes to complete.
- 3. Open a terminal shell, go to the *experiments* folder and run the file *proj_data_sorter.sh*.
+ 3. Follow the instructions in *experiments/ex_proj_hyper_cd.m*. It may take one hour to complete.
+ 4. Open a terminal shell, go to the *experiments* folder and run the file *proj_data_sorter.sh*.
 This will organize the csv files generated in the previous two steps.
 
 If all the scripts are completed successfully, then the following files will be generated.
 
-  * Files for table 1:
+  * Files for tables 2-3:
     * proj_hyper_n10_d1_30_tol_high.csv
     * proj_hyper_n10_d2_30_tol_high.csv
     * proj_hyper_n20_d1_30_tol_high.csv
     * proj_hyper_n20_d2_30_tol_high.csv
-  * Files for table 2:
+  * Files for tables 4-5:
     * proj_hyper_n30_d27_30_tol_high.csv
     * proj_hyper_n40_d37_30_tol_high.csv
     * proj_hyper_n50_d47_30_tol_high.csv
-  * Files for table 3:
+  * Files for table 6:
     * proj_hyper_n10_d1_30_tol_low.csv
     * proj_hyper_n10_d2_30_tol_low.csv
     * proj_hyper_n20_d1_30_tol_low.csv
     * proj_hyper_n20_d2_30_tol_low.csv
-  * Files for table 4:
+  * Files for table 7:
     * proj_hyper_n30_d27_30_tol_low.csv
     * proj_hyper_n40_d37_30_tol_low.csv
     * proj_hyper_n50_d47_30_tol_low.csv
-  * Files for table 5:
+  * Files for tables 8-9:
     * proj_pcone_n300_tol_high_all.csv
     * proj_pcone_n500_tol_high_all.csv
     * proj_pcone_n1000_tol_high_all.csv
-  * Files for table 6:
+  * Files for table 10:
     * proj_pcone_n300_tol_low_all.csv
     * proj_pcone_n500_tol_low_all.csv
     * proj_pcone_n1000_tol_low_all.csv
+  * Files for table 11:
+    * proj_hyper_cd_n10_d1_30_tol_high.csv
+    * proj_hyper_cd_n20_d2_30_tol_high.csv
 
-Because in the paper we used relative time taking the DDS and Mosek running times as 
-baselines, we expect that even if the experiments 
-are run in the different computers the times should be quite close to the ones we 
-reported.
+Part of the experiments use the relative time taking the DDS and Mosek running times as 
+baselines. For those experiments, even if they 
+are run in the different computers we expect that the times should be close to the ones we 
+reported in our paper provided that the same versions are used.
 
 ### Reproducing Figures 1 and 2
 See file *experiments/Ex_proj_hyper_eleSym_only_graph.m*
+
+### Reproducing the computations after Proposition 3.10.
+Run the python script *proj_on_poly.py*. It requires CVXPY.
 
 ## License
 The files under the *solver* folder are licensed under the GPLv3. The files 
  under the *experiments* folder are licensed under the MIT License.
 
-Copyright (C) 2024 Takayuki Nagano, Bruno F. Lourenço, Akiko Takeda
+Copyright (C) 2025 Takayuki Nagano, Bruno F. Lourenço, Akiko Takeda

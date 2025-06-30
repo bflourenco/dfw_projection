@@ -112,7 +112,7 @@ while(1)
     mineig_g = mineig_oracle(g,e);
     
     %solve subproblem and calculate descent direction
-    if mineig_g > -zero_eps % If g is included in Lambda(p,e)
+    if mineig_g > -zero_eps % If g is included in the cone
         feas(itr) = true;
         descent = -y(:,itr);
     else
