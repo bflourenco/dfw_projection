@@ -2,10 +2,10 @@ clearvars
 
 %% parameters
 % problem settings
-n=20; deriv_num=10; % Figure 1 in the paper
+n=20; deriv_num=10; % Figure 1a in the paper
 
-%n=30; deriv_num=15; % Figure 2 in the paper. Remove the comment marker to
-                     % display the plot associated to Figure 2
+%n=30; deriv_num=15; % Figure 1b in the paper. Remove the comment marker to
+                     % display the plot associated to Figure 1b
 max_time = 10;
 num_points = 10;
 

@@ -2,12 +2,12 @@
 % Code for the experiments regarding the c_D constant.
 %
 % Run with n = 10, deriv_num = 1 and with n = 20, deriv_num = 2 in order to 
-% generate the files for Table 11 in the paper.
+% generate the files for Table 8 in the paper.
 %
 clear;
 n = 10;
 deriv_num = 1;
-%Uncomment the next two lines for the experiments in Table 11 - c,d.
+%Uncomment the next two lines for the experiments in Table 8 - c,d.
 %n = 20; 
 %deriv_num = 2;
 
